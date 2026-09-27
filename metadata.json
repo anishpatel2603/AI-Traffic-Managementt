@@ -1,0 +1,8 @@
+{
+  "name": "Remix AI Smart Traffic Signal - Adaptive Management System",
+  "description": "AI-based adaptive traffic signal prototype analyzing traffic videos, detecting vehicles via computer vision, computing lane densities, and dynamically optimizing green light durations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

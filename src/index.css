@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #f8fafc;
+    color: #0f172a;
+    overflow-x: hidden;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  body.theme-light {
+    background-color: #f8fafc;
+    color: #0f172a;
+  }
+
+  body.theme-dark {
+    background-color: #0b0f19;
+    color: #f1f5f9;
+  }
+
+  body.theme-thermal {
+    background-color: #070314;
+    color: #fef3c7;
+  }
+}
+
+.font-mono-numbers {
+  font-family: 'JetBrains Mono', 'Roboto Mono', monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Realistic optical traffic signal indicators (no excessive neon blur) */
+.traffic-signal-red-active {
+  background-color: #dc2626;
+  box-shadow: 0 0 6px 1px rgba(220, 38, 38, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.4);
+}
+.traffic-signal-yellow-active {
+  background-color: #d97706;
+  box-shadow: 0 0 6px 1px rgba(217, 119, 6, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.4);
+}
+.traffic-signal-green-active {
+  background-color: #16a34a;
+  box-shadow: 0 0 6px 1px rgba(22, 163, 74, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.4);
+}
+

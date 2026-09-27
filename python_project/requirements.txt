@@ -1,0 +1,9 @@
+# AI Smart Traffic Signal - Dependencies
+# Requirements for running on standard student laptop
+streamlit>=1.32.0
+ultralytics>=8.1.0
+opencv-python-headless>=4.9.0.80
+numpy>=1.24.0
+pandas>=2.0.0
+Pillow>=10.0.0
+matplotlib>=3.8.0
