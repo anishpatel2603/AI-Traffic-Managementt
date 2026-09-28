@@ -1,6 +1,16 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @layer base {
+  html {
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
   body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background-color: #f8fafc;
@@ -9,19 +19,9 @@
     transition: background-color 0.2s ease, color 0.2s ease;
   }
 
-  body.theme-light {
-    background-color: #f8fafc;
-    color: #0f172a;
-  }
-
-  body.theme-dark {
+  html.dark body {
     background-color: #0b0f19;
     color: #f1f5f9;
-  }
-
-  body.theme-thermal {
-    background-color: #070314;
-    color: #fef3c7;
   }
 }
 
@@ -30,7 +30,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Realistic optical traffic signal indicators (no excessive neon blur) */
+/* Realistic optical traffic signal indicators */
 .traffic-signal-red-active {
   background-color: #dc2626;
   box-shadow: 0 0 6px 1px rgba(220, 38, 38, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.4);
@@ -43,4 +43,3 @@
   background-color: #16a34a;
   box-shadow: 0 0 6px 1px rgba(22, 163, 74, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.4);
 }
-

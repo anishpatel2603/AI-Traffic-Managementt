@@ -80,9 +80,15 @@ export default function App() {
   const prevCorridorRef = useRef<'NORTH-SOUTH' | 'EAST-WEST'>('NORTH-SOUTH');
   const lastSirenTimeRef = useRef<number>(0);
 
-  // Sync theme with body class
+  // Sync theme with documentElement and body class for Tailwind dark variant
   useEffect(() => {
-    document.body.className = `theme-${theme}`;
+    const isDark = theme === 'dark';
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    document.body.className = `theme-${theme} ${isDark ? 'dark' : ''}`;
   }, [theme]);
 
   const handleThemeChange = (newTheme: AppTheme) => {
@@ -229,7 +235,7 @@ export default function App() {
       : 'bg-slate-900 border-slate-800 text-slate-100';
 
   const subTextColor =
-    theme === 'light' ? 'text-slate-500' : 'text-slate-400';
+    theme === 'light' ? 'text-slate-600' : 'text-slate-400';
 
   return (
     <div className={`min-h-screen ${mainBgClass} flex flex-col font-sans transition-colors duration-200`}>
@@ -239,18 +245,18 @@ export default function App() {
         <div className="flex items-center gap-3">
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+              <span className="text-sm font-bold tracking-tight text-slate-950 dark:text-slate-100">
                 City Traffic Operations
               </span>
-              <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">·</span>
-              <span className="hidden sm:inline text-xs text-slate-500 dark:text-slate-400 font-normal">
+              <span className="text-slate-400 dark:text-slate-600 hidden sm:inline">·</span>
+              <span className="hidden sm:inline text-xs text-slate-700 dark:text-slate-300 font-medium">
                 4th & Grand Intersection (#104)
               </span>
             </div>
-            <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+            <div className="flex items-center gap-2 text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
               <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-600 dark:bg-emerald-500" />
-              <span>Adaptive Signal Control</span>
-              <span aria-hidden="true">·</span>
+              <span className="font-semibold text-slate-800 dark:text-slate-200">Adaptive Signal Control</span>
+              <span aria-hidden="true" className="text-slate-400">·</span>
               <span>Dynamic Queue Balancing</span>
             </div>
           </div>
@@ -332,15 +338,15 @@ export default function App() {
         <section className="space-y-2">
           <div className="flex items-center justify-between text-xs px-0.5">
             <div>
-              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-950 dark:text-slate-100">
                 Approach Traffic & Queue Status
               </h2>
               <p className={`text-[11px] ${subTextColor}`}>
                 Real-time queue length and signal clearance status on all four approaches
               </p>
             </div>
-            <div className="text-[11px] text-slate-500 font-medium hidden sm:block">
-              Total Inbound Queue: <strong className="text-slate-900 dark:text-slate-100">{detections.length} vehicles</strong>
+            <div className="text-[11px] text-slate-700 dark:text-slate-400 font-medium hidden sm:block">
+              Total Inbound Queue: <strong className="text-slate-950 dark:text-slate-100 font-bold">{detections.length} vehicles</strong>
             </div>
           </div>
           <LaneStatsCards stats={laneStats} lampStates={decision.lampStates} theme={theme} />

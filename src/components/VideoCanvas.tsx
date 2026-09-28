@@ -32,6 +32,24 @@ interface VideoCanvasProps {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
 }
 
+interface RainDrop {
+  x: number;
+  y: number;
+  speed: number;
+  length: number;
+  width: number;
+  alpha: number;
+  slant: number;
+}
+
+interface RainRipple {
+  x: number;
+  y: number;
+  radius: number;
+  maxRadius: number;
+  alpha: number;
+}
+
 const CLASS_COLORS: Record<string, string> = {
   Car: '#38bdf8',
   Bus: '#f97316',
@@ -53,6 +71,11 @@ export const VideoCanvas: React.FC<VideoCanvasProps> = ({
   const [latencyMs, setLatencyMs] = useState(13.8);
   const [fpsVal, setFpsVal] = useState(60.0);
   const [hoveredVehicle, setHoveredVehicle] = useState<VehicleDetection | null>(null);
+
+  // Rain particle simulation state
+  const rainDropsRef = useRef<RainDrop[]>([]);
+  const ripplesRef = useRef<RainRipple[]>([]);
+  const lastFrameTimeRef = useRef<number>(performance.now());
 
   // Simulated CV runtime telemetry
   useEffect(() => {
@@ -84,17 +107,40 @@ export const VideoCanvas: React.FC<VideoCanvasProps> = ({
     const isRain = config.weather === 'rain';
     const isFog = config.weather === 'fog';
 
+    // Delta time calculation for smooth atmospheric particles
+    const now = performance.now();
+    const dt = Math.min(0.05, Math.max(0.001, (now - lastFrameTimeRef.current) / 1000));
+    lastFrameTimeRef.current = now;
+
+    // Initialize multi-tier rain particle system if needed
+    if (rainDropsRef.current.length === 0) {
+      const drops: RainDrop[] = [];
+      for (let i = 0; i < 220; i++) {
+        const tier = i < 90 ? 1 : i < 180 ? 2 : 3;
+        drops.push({
+          x: Math.random() * (w + 200) - 100,
+          y: Math.random() * (h + 100) - 50,
+          speed: tier === 1 ? 650 + Math.random() * 250 : tier === 2 ? 950 + Math.random() * 300 : 1300 + Math.random() * 350,
+          length: tier === 1 ? 16 + Math.random() * 12 : tier === 2 ? 30 + Math.random() * 16 : 48 + Math.random() * 20,
+          width: tier === 1 ? 0.65 : tier === 2 ? 0.9 : 1.25,
+          alpha: tier === 1 ? 0.18 + Math.random() * 0.12 : tier === 2 ? 0.28 + Math.random() * 0.16 : 0.38 + Math.random() * 0.22,
+          slant: -0.16 + (Math.random() - 0.5) * 0.03,
+        });
+      }
+      rainDropsRef.current = drops;
+    }
+
     // 1. CLEAR & DRAW SURROUNDING TERRAIN / PAVEMENT
     ctx.clearRect(0, 0, w, h);
 
     if (isThermal) {
       ctx.fillStyle = '#080512';
     } else if (isNight) {
-      ctx.fillStyle = '#0a0e17';
+      ctx.fillStyle = isRain ? '#070a10' : '#0a0e17';
     } else if (isFog) {
-      ctx.fillStyle = '#1e2430';
+      ctx.fillStyle = theme === 'light' ? '#cbd5e1' : '#1e2430';
     } else if (isRain) {
-      ctx.fillStyle = '#0f141d';
+      ctx.fillStyle = theme === 'light' ? '#cbd5e1' : '#0a0e14';
     } else if (theme === 'light') {
       ctx.fillStyle = '#f1f5f9';
     } else {
@@ -108,9 +154,9 @@ export const VideoCanvas: React.FC<VideoCanvasProps> = ({
       : isNight
       ? '#111827'
       : isFog
-      ? '#263040'
+      ? (theme === 'light' ? '#94a3b8' : '#263040')
       : isRain
-      ? '#1a2230'
+      ? (theme === 'light' ? '#94a3b8' : '#141c28')
       : theme === 'light'
       ? '#e2e8f0'
       : '#1e293b';
@@ -128,7 +174,7 @@ export const VideoCanvas: React.FC<VideoCanvasProps> = ({
       : isFog
       ? '#334155'
       : isRain
-      ? '#334155'
+      ? (theme === 'light' ? '#64748b' : '#334155')
       : theme === 'light'
       ? '#cbd5e1'
       : '#334155';
@@ -142,11 +188,11 @@ export const VideoCanvas: React.FC<VideoCanvasProps> = ({
     const asphaltColor = isThermal
       ? '#120a24'
       : isNight
-      ? '#0b0f17'
+      ? (isRain ? '#090d14' : '#0b0f17')
       : isRain
-      ? '#141a24' // wet dark asphalt
+      ? (theme === 'light' ? '#1e293b' : '#0f172a') // realistic wet dark slate asphalt
       : isFog
-      ? '#222b38'
+      ? (theme === 'light' ? '#475569' : '#222b38')
       : theme === 'light'
       ? '#334155' // realistic deep slate asphalt
       : '#1e2633';
@@ -173,6 +219,42 @@ export const VideoCanvas: React.FC<VideoCanvasProps> = ({
     // Junction center box
     ctx.fillStyle = asphaltColor;
     ctx.fillRect(cx - halfRoad, cy - halfRoad, roadW, roadW);
+
+    // Wet Asphalt Pavement Sheen & Reflections (Rain Mode)
+    if (isRain && !isThermal) {
+      ctx.save();
+      // Subtle wet pavement sheen on horizontal & vertical asphalt
+      const sheenV = ctx.createLinearGradient(cx - halfRoad, 0, cx + halfRoad, 0);
+      sheenV.addColorStop(0, 'rgba(255, 255, 255, 0.01)');
+      sheenV.addColorStop(0.5, 'rgba(224, 242, 254, 0.06)');
+      sheenV.addColorStop(1, 'rgba(255, 255, 255, 0.01)');
+      ctx.fillStyle = sheenV;
+      ctx.fillRect(cx - halfRoad, 0, roadW, h);
+
+      const sheenH = ctx.createLinearGradient(0, cy - halfRoad, 0, cy + halfRoad);
+      sheenH.addColorStop(0, 'rgba(255, 255, 255, 0.01)');
+      sheenH.addColorStop(0.5, 'rgba(224, 242, 254, 0.06)');
+      sheenH.addColorStop(1, 'rgba(255, 255, 255, 0.01)');
+      ctx.fillStyle = sheenH;
+      ctx.fillRect(0, cy - halfRoad, w, roadW);
+
+      // Wet reflections of active signals onto wet road surface
+      const drawWetSignalReflection = (x: number, y: number, col: string) => {
+        const refGrad = ctx.createLinearGradient(x, y, x, y + 40);
+        refGrad.addColorStop(0, col);
+        refGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = refGrad;
+        ctx.fillRect(x - 8, y, 16, 40);
+      };
+
+      const nsColor = decision.currentSignal === 'NORTH-SOUTH' ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.12)';
+      const ewColor = decision.currentSignal === 'EAST-WEST' ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.12)';
+      drawWetSignalReflection(cx + halfRoad - 20, cy - halfRoad, nsColor);
+      drawWetSignalReflection(cx - halfRoad + 20, cy + halfRoad, nsColor);
+      drawWetSignalReflection(cx - halfRoad, cy - halfRoad + 20, ewColor);
+      drawWetSignalReflection(cx + halfRoad, cy + halfRoad - 20, ewColor);
+      ctx.restore();
+    }
 
     // 3. ROAD MARKINGS: Double solid yellow center divider lines
     ctx.strokeStyle = isThermal ? '#f59e0b' : '#eab308';
@@ -437,19 +519,33 @@ export const VideoCanvas: React.FC<VideoCanvasProps> = ({
         ctx.restore();
       }
 
-      // Tire water spray kicked up behind moving vehicles in Rain
-      if (isRain && !isThermal && det.speed > 0.4) {
+      // Realistic feathered tire water spray mist kicked up behind moving vehicles in Rain
+      if (isRain && !isThermal && det.speed > 0.35) {
         ctx.save();
-        ctx.fillStyle = 'rgba(186, 230, 253, 0.25)';
+        let sx = vx;
+        let sy = vy;
         if (det.lane === 'North') {
-          ctx.fillRect(x1 + 2, y1 - 8, vw - 4, 6);
+          sx = vx;
+          sy = y1 - 3;
         } else if (det.lane === 'South') {
-          ctx.fillRect(x1 + 2, y2 + 2, vw - 4, 6);
+          sx = vx;
+          sy = y2 + 3;
         } else if (det.lane === 'East') {
-          ctx.fillRect(x2 + 2, y1 + 2, 6, vh - 4);
+          sx = x2 + 3;
+          sy = vy;
         } else {
-          ctx.fillRect(x1 - 8, y1 + 2, 6, vh - 4);
+          sx = x1 - 3;
+          sy = vy;
         }
+        const sprayRadius = Math.min(18, 8 + det.speed * 8);
+        const spray = ctx.createRadialGradient(sx, sy, 1, sx, sy, sprayRadius);
+        spray.addColorStop(0, 'rgba(224, 242, 254, 0.28)');
+        spray.addColorStop(0.5, 'rgba(224, 242, 254, 0.12)');
+        spray.addColorStop(1, 'rgba(224, 242, 254, 0)');
+        ctx.fillStyle = spray;
+        ctx.beginPath();
+        ctx.arc(sx, sy, sprayRadius, 0, Math.PI * 2);
+        ctx.fill();
         ctx.restore();
       }
 
@@ -659,31 +755,65 @@ export const VideoCanvas: React.FC<VideoCanvasProps> = ({
 
     // 10. ATMOSPHERIC WEATHER VISUAL LAYERS
     if (isRain && !isThermal) {
-      // Dynamic falling raindrops and streaks
       ctx.save();
-      ctx.strokeStyle = 'rgba(186, 230, 253, 0.42)';
-      ctx.lineWidth = 1.3;
-      ctx.beginPath();
-      const t = performance.now() * 0.001;
-      for (let i = 0; i < 96; i++) {
-        const rx = ((i * 71 + t * 450) % (w + 60)) - 30;
-        const ry = (i * 37 + t * 900) % (h + 30);
-        ctx.moveTo(rx, ry);
-        ctx.lineTo(rx - 5, ry + 15);
-      }
-      ctx.stroke();
 
-      // Puddle ripple rings on road shoulders and corners
-      ctx.strokeStyle = 'rgba(186, 230, 253, 0.18)';
-      ctx.lineWidth = 1;
-      for (let p = 0; p < 8; p++) {
-        const px = ((p * 137 + t * 40) % (w - 120)) + 60;
-        const py = ((p * 79 + t * 25) % (h - 120)) + 60;
-        const radius = ((t * 18 + p * 6) % 14);
+      // Atmospheric moist rain-wash tint
+      ctx.fillStyle = theme === 'light' ? 'rgba(148, 163, 184, 0.08)' : 'rgba(15, 23, 42, 0.18)';
+      ctx.fillRect(0, 0, w, h);
+
+      // A. Ground Ripple Puddle Splashes (perspective elliptical rings)
+      const ripples = ripplesRef.current;
+      for (let i = ripples.length - 1; i >= 0; i--) {
+        const rip = ripples[i];
+        rip.radius += dt * 18;
+        rip.alpha -= dt * 1.6;
+        if (rip.alpha <= 0 || rip.radius >= rip.maxRadius) {
+          ripples.splice(i, 1);
+          continue;
+        }
+        ctx.strokeStyle = `rgba(224, 242, 254, ${Math.max(0, rip.alpha)})`;
+        ctx.lineWidth = 0.9;
         ctx.beginPath();
-        ctx.arc(px, py, radius, 0, Math.PI * 2);
+        ctx.ellipse(rip.x, rip.y, rip.radius * 1.6, rip.radius * 0.55, 0, 0, Math.PI * 2);
         ctx.stroke();
       }
+
+      // B. Dynamic Falling Rain Streaks (Multi-depth parallax)
+      const drops = rainDropsRef.current;
+      for (let i = 0; i < drops.length; i++) {
+        const drop = drops[i];
+        drop.y += drop.speed * dt;
+        drop.x += drop.speed * drop.slant * dt;
+
+        // Check if hit bottom of screen
+        if (drop.y > h + 30) {
+          // If hit road or crosswalk, spawn puddle splash with ~30% probability
+          if (
+            ripples.length < 28 &&
+            Math.random() < 0.32 &&
+            (Math.abs(drop.x - cx) < halfRoad || Math.abs(drop.y - cy) < halfRoad)
+          ) {
+            ripples.push({
+              x: drop.x,
+              y: Math.min(h - 10, drop.y - 15),
+              radius: 1.2,
+              maxRadius: 4.5 + Math.random() * 5.5,
+              alpha: 0.38 + Math.random() * 0.15,
+            });
+          }
+          drop.y = -drop.length - Math.random() * 40;
+          drop.x = Math.random() * (w + 200) - 100;
+        }
+
+        // Draw raindrop streak with tapered motion blur
+        ctx.strokeStyle = `rgba(224, 242, 254, ${drop.alpha})`;
+        ctx.lineWidth = drop.width;
+        ctx.beginPath();
+        ctx.moveTo(drop.x, drop.y);
+        ctx.lineTo(drop.x + drop.length * drop.slant, drop.y + drop.length);
+        ctx.stroke();
+      }
+
       ctx.restore();
     } else if (isFog && !isThermal) {
       // Dense atmospheric fog and drifting mist layers
@@ -721,25 +851,25 @@ export const VideoCanvas: React.FC<VideoCanvasProps> = ({
       {/* Top Camera Telemetry & Overlay Bar */}
       <div className={`flex flex-wrap items-center justify-between px-4 py-2.5 border-b text-xs gap-2 ${
         theme === 'light'
-          ? 'bg-slate-50 border-slate-200 text-slate-700'
-          : 'bg-slate-950/80 border-slate-800 text-slate-300'
+          ? 'bg-slate-50 border-slate-200 text-slate-800'
+          : 'bg-slate-950/80 border-slate-800 text-slate-200'
       }`}>
         <div className="flex items-center gap-2.5">
-          <span className="font-bold text-xs flex items-center gap-2 text-slate-900 dark:text-slate-100">
+          <span className="font-bold text-xs flex items-center gap-2 text-slate-950 dark:text-slate-100">
             <span
               className={`w-2 h-2 rounded-full ${
-                isRunning ? 'bg-emerald-500' : 'bg-slate-400'
+                isRunning ? 'bg-emerald-600' : 'bg-slate-400'
               }`}
             />
             Live Junction View
           </span>
-          <span className="text-slate-300 dark:text-slate-700">·</span>
-          <div className="hidden sm:flex items-center gap-2.5 text-xs text-slate-500 dark:text-slate-400">
+          <span className="text-slate-400 dark:text-slate-600">·</span>
+          <div className="hidden sm:flex items-center gap-2.5 text-xs text-slate-700 dark:text-slate-300 font-medium">
             <span>CAM-04 (4th & Grand)</span>
-            <span aria-hidden="true">·</span>
+            <span aria-hidden="true" className="text-slate-400">·</span>
             <span>60 FPS</span>
-            <span aria-hidden="true">·</span>
-            <span>In-Frame: <strong className="text-slate-800 dark:text-slate-200 font-semibold">{detections.length} vehicles</strong></span>
+            <span aria-hidden="true" className="text-slate-400">·</span>
+            <span>In-Frame: <strong className="text-slate-950 dark:text-white font-bold">{detections.length} vehicles</strong></span>
           </div>
         </div>
 
@@ -753,8 +883,8 @@ export const VideoCanvas: React.FC<VideoCanvasProps> = ({
               onClick={() => onUpdateConfig({ weather: 'clear' })}
               className={`px-2 py-0.5 rounded transition-colors flex items-center gap-1 cursor-pointer font-medium ${
                 (config.weather || 'clear') === 'clear'
-                  ? theme === 'light' ? 'bg-slate-100 text-slate-900 font-semibold' : 'bg-slate-800 text-white font-semibold'
-                  : 'text-slate-500 hover:text-slate-800'
+                  ? theme === 'light' ? 'bg-slate-100 text-slate-950 font-bold' : 'bg-slate-800 text-white font-semibold'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
               title="Clear: Dry Asphalt"
             >
@@ -765,8 +895,8 @@ export const VideoCanvas: React.FC<VideoCanvasProps> = ({
               onClick={() => onUpdateConfig({ weather: 'rain' })}
               className={`px-2 py-0.5 rounded transition-colors flex items-center gap-1 cursor-pointer font-medium ${
                 config.weather === 'rain'
-                  ? theme === 'light' ? 'bg-slate-100 text-slate-900 font-semibold' : 'bg-slate-800 text-white font-semibold'
-                  : 'text-slate-500 hover:text-slate-800'
+                  ? theme === 'light' ? 'bg-slate-100 text-slate-950 font-bold' : 'bg-slate-800 text-white font-semibold'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
               title="Rain: Wet Road Conditions"
             >
@@ -777,12 +907,12 @@ export const VideoCanvas: React.FC<VideoCanvasProps> = ({
               onClick={() => onUpdateConfig({ weather: 'fog' })}
               className={`px-2 py-0.5 rounded transition-colors flex items-center gap-1 cursor-pointer font-medium ${
                 config.weather === 'fog'
-                  ? theme === 'light' ? 'bg-slate-100 text-slate-900 font-semibold' : 'bg-slate-800 text-white font-semibold'
-                  : 'text-slate-500 hover:text-slate-800'
+                  ? theme === 'light' ? 'bg-slate-100 text-slate-950 font-bold' : 'bg-slate-800 text-white font-semibold'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
               title="Fog: Low Visibility"
             >
-              <CloudFog className="w-3 h-3 text-slate-400" />
+              <CloudFog className="w-3 h-3 text-slate-500" />
               Fog
             </button>
           </div>
@@ -791,10 +921,10 @@ export const VideoCanvas: React.FC<VideoCanvasProps> = ({
             onClick={() =>
               onUpdateConfig({ showBoundingBoxes: !config.showBoundingBoxes })
             }
-            className={`px-2.5 py-1 rounded text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer border ${
+            className={`px-2.5 py-1 rounded text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer border ${
               config.showBoundingBoxes
-                ? theme === 'light' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-slate-800 text-sky-300 border-slate-700'
-                : theme === 'light' ? 'bg-white text-slate-600 border-slate-200 hover:text-slate-900' : 'bg-slate-900 text-slate-400 border-slate-800'
+                ? theme === 'light' ? 'bg-blue-50 text-blue-800 border-blue-300' : 'bg-slate-800 text-sky-300 border-slate-700'
+                : theme === 'light' ? 'bg-white text-slate-700 border-slate-200 hover:text-slate-950' : 'bg-slate-900 text-slate-400 border-slate-800'
             }`}
             title="Toggle Vehicle Detection Outlines"
           >
@@ -804,10 +934,10 @@ export const VideoCanvas: React.FC<VideoCanvasProps> = ({
 
           <button
             onClick={() => onUpdateConfig({ showCentroids: !config.showCentroids })}
-            className={`px-2.5 py-1 rounded text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer border ${
+            className={`px-2.5 py-1 rounded text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer border ${
               config.showCentroids
-                ? theme === 'light' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-slate-800 text-amber-300 border-slate-700'
-                : theme === 'light' ? 'bg-white text-slate-600 border-slate-200 hover:text-slate-900' : 'bg-slate-900 text-slate-400 border-slate-800'
+                ? theme === 'light' ? 'bg-amber-50 text-amber-800 border-amber-300' : 'bg-slate-800 text-amber-300 border-slate-700'
+                : theme === 'light' ? 'bg-white text-slate-700 border-slate-200 hover:text-slate-950' : 'bg-slate-900 text-slate-400 border-slate-800'
             }`}
             title="Toggle Tracking Vectors"
           >

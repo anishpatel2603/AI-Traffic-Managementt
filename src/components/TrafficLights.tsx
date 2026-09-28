@@ -59,7 +59,7 @@ export const TrafficLights: React.FC<TrafficLightsProps> = ({
               {emergencyActive ? 'Emergency Corridor Priority' : `${activeCorridorLabel} Green Phase`}
             </span>
           </div>
-          <span className={`text-[11px] block mt-0.5 text-slate-600 dark:text-slate-400`}>
+          <span className="text-[11px] block mt-0.5 text-slate-700 dark:text-slate-300 font-medium">
             {emergencyActive
               ? 'Clearing junction for emergency vehicle'
               : isYellow
@@ -69,16 +69,16 @@ export const TrafficLights: React.FC<TrafficLightsProps> = ({
         </div>
 
         <div className="flex items-baseline gap-1 text-right">
-          <span className={`text-2xl font-bold font-mono-numbers ${
+          <span className={`text-2xl font-extrabold font-mono-numbers ${
             emergencyActive
-              ? 'text-red-600 dark:text-red-400'
+              ? 'text-red-700 dark:text-red-400'
               : isYellow
-              ? 'text-amber-600 dark:text-amber-400'
-              : 'text-emerald-600 dark:text-emerald-400'
+              ? 'text-amber-700 dark:text-amber-400'
+              : 'text-emerald-700 dark:text-emerald-400'
           }`}>
             {countdown}
           </span>
-          <span className="text-xs text-slate-500 dark:text-slate-400">sec</span>
+          <span className="text-xs text-slate-700 dark:text-slate-300 font-semibold">sec</span>
         </div>
       </div>
 
@@ -96,10 +96,10 @@ export const TrafficLights: React.FC<TrafficLightsProps> = ({
               className={`flex flex-col items-center p-3 rounded-lg border ${lightPodBg}`}
             >
               <div className="text-center mb-2.5">
-                <div className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                <div className="text-xs font-bold text-slate-950 dark:text-slate-100">
                   {label}
                 </div>
-                <div className="text-[10px] text-slate-400">
+                <div className="text-[10px] text-slate-600 dark:text-slate-400 font-bold">
                   {approach}
                 </div>
               </div>

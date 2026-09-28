@@ -41,19 +41,19 @@ export const EfficiencyBenchmark: React.FC<EfficiencyBenchmarkProps> = ({
       : 'bg-slate-950/70 border-slate-800';
 
   const subTextColor =
-    theme === 'light' ? 'text-slate-500' : 'text-slate-400';
+    theme === 'light' ? 'text-slate-600' : 'text-slate-400';
 
   return (
     <div className={`${containerBg} border rounded-xl p-5 space-y-4 transition-colors`}>
       <div className={`flex flex-wrap items-center justify-between pb-3 border-b gap-2 ${
-        theme === 'light' ? 'border-slate-100' : 'border-slate-800'
+        theme === 'light' ? 'border-slate-200' : 'border-slate-800'
       }`}>
         <div>
-          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100 flex items-center gap-2">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-950 dark:text-slate-100 flex items-center gap-2">
             <Gauge className="w-4 h-4 text-blue-600" />
             Signal Timing Efficiency & Delay Audit
           </h3>
-          <p className={`text-[11px] ${subTextColor} mt-0.5`}>
+          <p className={`text-[11px] font-medium ${subTextColor} mt-0.5`}>
             Empirical comparative analysis of adaptive queue balancing versus conventional fixed 30s timers
           </p>
         </div>
@@ -66,7 +66,7 @@ export const EfficiencyBenchmark: React.FC<EfficiencyBenchmarkProps> = ({
             onClick={() => setComparisonMode('fixed')}
             className={`px-3 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer ${
               comparisonMode === 'fixed'
-                ? 'bg-white text-slate-900 font-semibold shadow-xs dark:bg-slate-800 dark:text-white'
+                ? 'bg-white text-slate-950 font-bold shadow-xs dark:bg-slate-800 dark:text-white'
                 : subTextColor
             }`}
           >
@@ -76,7 +76,7 @@ export const EfficiencyBenchmark: React.FC<EfficiencyBenchmarkProps> = ({
             onClick={() => setComparisonMode('adaptive')}
             className={`px-3 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer ${
               comparisonMode === 'adaptive'
-                ? 'bg-blue-600 text-white font-semibold shadow-xs'
+                ? 'bg-slate-900 text-white font-bold shadow-xs dark:bg-white dark:text-slate-900'
                 : subTextColor
             }`}
           >
@@ -89,51 +89,51 @@ export const EfficiencyBenchmark: React.FC<EfficiencyBenchmarkProps> = ({
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {/* Wait time */}
         <div className={`p-3.5 rounded-lg border flex flex-col justify-between ${cardPodBg}`}>
-          <div className={`flex items-center justify-between text-[11px] font-medium ${subTextColor}`}>
+          <div className={`flex items-center justify-between text-[11px] font-semibold ${subTextColor}`}>
             <span>Avg Vehicle Delay</span>
             <TrendingDown className="w-3.5 h-3.5 text-blue-600" />
           </div>
           <div className="mt-2 flex items-baseline gap-1.5">
-            <span className="font-mono-numbers text-2xl font-bold text-slate-900 dark:text-slate-100">
+            <span className="font-mono-numbers text-2xl font-extrabold text-slate-950 dark:text-slate-100">
               {comparisonMode === 'adaptive' ? `${adaptiveAvgWaitSec}s` : `${fixedAvgWaitSec}s`}
             </span>
-            <span className={`text-[11px] ${subTextColor}`}>/ vehicle</span>
+            <span className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">/ vehicle</span>
           </div>
-          <div className="mt-1 text-[11px] text-emerald-600 font-medium font-mono-numbers">
+          <div className="mt-1 text-[11px] text-emerald-700 dark:text-emerald-400 font-bold font-mono-numbers">
             -{waitReductionPct}% time saved
           </div>
         </div>
 
         {/* Throughput */}
         <div className={`p-3.5 rounded-lg border flex flex-col justify-between ${cardPodBg}`}>
-          <div className={`flex items-center justify-between text-[11px] font-medium ${subTextColor}`}>
+          <div className={`flex items-center justify-between text-[11px] font-semibold ${subTextColor}`}>
             <span>Flow Throughput</span>
             <Zap className="w-3.5 h-3.5 text-amber-600" />
           </div>
           <div className="mt-2 flex items-baseline gap-1.5">
-            <span className="font-mono-numbers text-2xl font-bold text-slate-900 dark:text-slate-100">
+            <span className="font-mono-numbers text-2xl font-extrabold text-slate-950 dark:text-slate-100">
               {comparisonMode === 'adaptive' ? adaptiveThroughputPerHour : fixedThroughputPerHour}
             </span>
-            <span className={`text-[11px] ${subTextColor}`}>veh / hr</span>
+            <span className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">veh / hr</span>
           </div>
-          <div className="mt-1 text-[11px] text-amber-600 font-medium font-mono-numbers">
+          <div className="mt-1 text-[11px] text-amber-700 dark:text-amber-400 font-bold font-mono-numbers">
             +{throughputGainPct}% capacity boost
           </div>
         </div>
 
         {/* Fuel Saved */}
         <div className={`p-3.5 rounded-lg border flex flex-col justify-between ${cardPodBg}`}>
-          <div className={`flex items-center justify-between text-[11px] font-medium ${subTextColor}`}>
+          <div className={`flex items-center justify-between text-[11px] font-semibold ${subTextColor}`}>
             <span>Idling Fuel Saved</span>
             <Fuel className="w-3.5 h-3.5 text-slate-600" />
           </div>
           <div className="mt-2 flex items-baseline gap-1.5">
-            <span className="font-mono-numbers text-2xl font-bold text-slate-900 dark:text-slate-100">
+            <span className="font-mono-numbers text-2xl font-extrabold text-slate-950 dark:text-slate-100">
               ~34.2
             </span>
-            <span className={`text-[11px] ${subTextColor}`}>L / day</span>
+            <span className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">L / day</span>
           </div>
-          <div className="mt-1 text-[11px] text-slate-600 dark:text-slate-400 font-medium">
+          <div className="mt-1 text-[11px] text-slate-700 dark:text-slate-300 font-semibold">
             Zero idle fuel waste
           </div>
         </div>

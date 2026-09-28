@@ -34,11 +34,11 @@ export const EmergencyPriorityBar: React.FC<EmergencyPriorityBarProps> = ({
 
   const containerBg =
     theme === 'light'
-      ? 'bg-white border-slate-200 text-slate-900 shadow-xs'
+      ? 'bg-white border-slate-200/90 text-slate-950 shadow-xs'
       : 'bg-slate-900 border-slate-800 text-slate-100 shadow-xs';
 
   const subTextColor =
-    theme === 'light' ? 'text-slate-500' : 'text-slate-400';
+    theme === 'light' ? 'text-slate-600' : 'text-slate-400';
 
   return (
     <div className={`w-full rounded-xl border p-4 transition-colors ${containerBg}`}>
@@ -46,13 +46,13 @@ export const EmergencyPriorityBar: React.FC<EmergencyPriorityBarProps> = ({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-start gap-3">
           <div className={`p-2 rounded-lg shrink-0 mt-0.5 ${
-            emergencyActive ? 'bg-red-500 text-white animate-pulse' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
+            emergencyActive ? 'bg-red-500 text-white animate-pulse' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
           }`}>
             <Siren className="w-4 h-4" />
           </div>
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+              <h3 className="text-sm font-bold text-slate-950 dark:text-slate-100">
                 Emergency Vehicle Priority Override
               </h3>
               {emergencyActive && (
@@ -61,7 +61,7 @@ export const EmergencyPriorityBar: React.FC<EmergencyPriorityBarProps> = ({
                 </span>
               )}
             </div>
-            <p className={`text-xs ${subTextColor} mt-0.5`}>
+            <p className={`text-xs ${subTextColor} font-medium mt-0.5`}>
               Preempts normal cycle to provide instant green corridor for approaching emergency fleet
             </p>
           </div>
@@ -79,10 +79,10 @@ export const EmergencyPriorityBar: React.FC<EmergencyPriorityBarProps> = ({
       </div>
 
       {/* Control Actions Row */}
-      <div className="mt-3.5 flex flex-wrap items-center gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+      <div className="mt-3.5 flex flex-wrap items-center gap-3 pt-3 border-t border-slate-200 dark:border-slate-800">
         {/* Lane Selector */}
         <div className="flex items-center gap-2">
-          <span className={`text-xs font-medium ${subTextColor}`}>
+          <span className={`text-xs font-semibold ${subTextColor}`}>
             Inbound Corridor:
           </span>
           <div className="flex items-center p-0.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-950 text-xs">

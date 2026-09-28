@@ -26,11 +26,11 @@ export const DensityBarChart: React.FC<DensityBarChartProps> = ({ stats, config,
       : 'bg-slate-900 border-slate-800 shadow-sm text-slate-100';
 
   const subTextColor =
-    theme === 'light' ? 'text-slate-500' : 'text-slate-400';
+    theme === 'light' ? 'text-slate-600' : 'text-slate-400';
 
   const trackBg =
     theme === 'light'
-      ? 'bg-slate-100'
+      ? 'bg-slate-200'
       : 'bg-slate-800';
 
   return (
@@ -40,17 +40,17 @@ export const DensityBarChart: React.FC<DensityBarChartProps> = ({ stats, config,
         theme === 'light' ? 'border-slate-200' : 'border-slate-800'
       }`}>
         <div>
-          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100 flex items-center gap-2">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-950 dark:text-slate-100 flex items-center gap-2">
             <BarChart3 className="w-4 h-4 text-blue-600" />
-            AI Traffic Density Analysis
+            Approach Queue Density Analysis
           </h3>
-          <p className={`text-[11px] ${subTextColor}`}>
+          <p className={`text-[11px] font-medium ${subTextColor}`}>
             Approach queue distribution and threshold evaluation
           </p>
         </div>
 
         {/* Legend */}
-        <div className={`hidden sm:flex items-center gap-3 text-[11px] ${subTextColor}`}>
+        <div className={`hidden sm:flex items-center gap-3 text-[11px] font-medium ${subTextColor}`}>
           <span className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-600" /> Low (0–{config.lowThreshold})
           </span>
@@ -79,23 +79,23 @@ export const DensityBarChart: React.FC<DensityBarChartProps> = ({ stats, config,
 
           const densityTag =
             density === 'HIGH'
-              ? 'text-red-700 bg-red-50 border-red-200 dark:bg-red-950/30 dark:text-red-400 dark:border-red-800'
+              ? 'text-red-800 bg-red-50 border-red-300 dark:bg-red-950/40 dark:text-red-300 dark:border-red-800'
               : density === 'MEDIUM'
-              ? 'text-amber-700 bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800'
-              : 'text-emerald-700 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800';
+              ? 'text-amber-800 bg-amber-50 border-amber-300 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800'
+              : 'text-emerald-800 bg-emerald-50 border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800';
 
           return (
             <div key={id} className="space-y-1">
               <div className="flex items-center justify-between text-xs">
-                <span className="font-semibold text-slate-800 dark:text-slate-200 w-16 text-xs">
+                <span className="font-bold text-slate-950 dark:text-slate-200 w-16 text-xs">
                   {label}
                 </span>
 
                 <div className="flex items-center gap-2">
-                  <span className="font-mono-numbers font-bold text-sm text-slate-900 dark:text-slate-100">
+                  <span className="font-mono-numbers font-bold text-sm text-slate-950 dark:text-slate-100">
                     {count} {count === 1 ? 'veh' : 'veh'}
                   </span>
-                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded border ${densityTag}`}>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${densityTag}`}>
                     {density}
                   </span>
                 </div>

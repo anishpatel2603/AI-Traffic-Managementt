@@ -49,7 +49,7 @@ export const VehicleTypeStats: React.FC<VehicleTypeStatsProps> = ({
       : 'bg-slate-950/70 border-slate-800';
 
   const subTextColor =
-    theme === 'light' ? 'text-slate-500' : 'text-slate-400';
+    theme === 'light' ? 'text-slate-600' : 'text-slate-400';
 
   const vehicleCards = [
     {
@@ -68,7 +68,7 @@ export const VehicleTypeStats: React.FC<VehicleTypeStatsProps> = ({
     },
     {
       type: 'Freight Trucks',
-      icon: <Truck className="w-4 h-4 text-slate-600 dark:text-slate-300" />,
+      icon: <Truck className="w-4 h-4 text-slate-700 dark:text-slate-300" />,
       count: totals.Truck,
       share: totalActive > 0 ? Math.round((totals.Truck / totalActive) * 100) : 0,
       badge: 'Commercial Fleet',
@@ -86,27 +86,27 @@ export const VehicleTypeStats: React.FC<VehicleTypeStatsProps> = ({
     <div className={`${containerBg} border rounded-xl p-5 space-y-4 transition-colors`}>
       {/* Header */}
       <div className={`flex flex-wrap items-center justify-between pb-3 border-b gap-2 ${
-        theme === 'light' ? 'border-slate-100' : 'border-slate-800'
+        theme === 'light' ? 'border-slate-200' : 'border-slate-800'
       }`}>
         <div>
-          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-950 dark:text-slate-100">
             Vehicle Classification Breakdown
           </h3>
-          <p className={`text-[11px] ${subTextColor}`}>
+          <p className={`text-[11px] font-medium ${subTextColor}`}>
             Traffic composition across cars, public transit, commercial, and two-wheelers
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           {emergencyActive && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border bg-red-50 border-red-200 text-red-700 dark:bg-red-950/30 dark:border-red-800 dark:text-red-400 text-xs font-medium">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border bg-red-50 border-red-300 text-red-800 dark:bg-red-950/40 dark:border-red-800 dark:text-red-300 text-xs font-bold">
               <span>{emergencyType || 'Emergency'} Corridor Active</span>
             </div>
           )}
 
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-slate-200 bg-slate-50 text-slate-700 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 text-xs">
-            <span className="text-[11px] text-slate-500 dark:text-slate-400">Total Detected:</span>
-            <span className="font-semibold text-[11px] text-slate-900 dark:text-slate-100">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-slate-200 bg-slate-50 text-slate-800 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 text-xs">
+            <span className="text-[11px] text-slate-600 dark:text-slate-400 font-medium">Total Detected:</span>
+            <span className="font-bold text-[11px] text-slate-950 dark:text-slate-100">
               {totalActive} vehicles
             </span>
           </div>
@@ -124,20 +124,20 @@ export const VehicleTypeStats: React.FC<VehicleTypeStatsProps> = ({
               <span className="p-1 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
                 {vc.icon}
               </span>
-              <span className={`text-[10px] font-semibold uppercase tracking-wider ${subTextColor}`}>
+              <span className={`text-[10px] font-bold uppercase tracking-wider ${subTextColor}`}>
                 {vc.badge}
               </span>
             </div>
 
             <div className="mt-3">
-              <span className={`text-xs font-medium block text-slate-700 dark:text-slate-300`}>
+              <span className="text-xs font-semibold block text-slate-950 dark:text-slate-200">
                 {vc.type}
               </span>
               <div className="flex items-baseline gap-1.5 mt-0.5">
-                <span className="font-mono-numbers text-2xl font-bold text-slate-900 dark:text-slate-100">
+                <span className="font-mono-numbers text-2xl font-extrabold text-slate-950 dark:text-slate-100">
                   {vc.count}
                 </span>
-                <span className={`text-[11px] font-mono-numbers ${subTextColor}`}>
+                <span className={`text-[11px] font-mono-numbers font-medium ${subTextColor}`}>
                   ({vc.share}%)
                 </span>
               </div>
