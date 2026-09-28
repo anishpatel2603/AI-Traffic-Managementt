@@ -23,6 +23,7 @@ import { VehicleTypeStats } from './components/VehicleTypeStats';
 import { ThemeToggle } from './components/ThemeToggle';
 import { EmergencyPriorityBar } from './components/EmergencyPriorityBar';
 import { SettingsModal } from './components/SettingsModal';
+import { RealVideoAnalyzer } from './components/RealVideoAnalyzer';
 import {
   Settings2,
   AlertCircle,
@@ -31,6 +32,7 @@ import {
   Gauge,
   LayoutDashboard,
   Siren,
+  FileVideo,
 } from 'lucide-react';
 
 const DEFAULT_CONFIG: SystemConfig = {
@@ -66,7 +68,7 @@ export default function App() {
   const [speedMultiplier, setSpeedMultiplier] = useState<number>(1.0);
   const [currentPreset, setCurrentPreset] = useState<ScenarioPreset>('heavy-ns');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'benchmark'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'video-analyzer' | 'benchmark'>('dashboard');
   const [selectedEmergencyLane, setSelectedEmergencyLane] = useState<LaneDirection>('North');
 
   // Modals state
@@ -263,31 +265,46 @@ export default function App() {
         </div>
 
         {/* View mode toggle */}
-        <nav className={`hidden md:flex items-center gap-1 p-1 rounded-lg border text-xs ${
+        <nav className={`flex items-center gap-1 p-1 rounded-lg border text-xs overflow-x-auto ${
           theme === 'light' ? 'bg-slate-100 border-slate-200' : 'bg-slate-950 border-slate-800'
         }`}>
           <button
             onClick={() => setActiveTab('dashboard')}
-            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
               activeTab === 'dashboard'
                 ? 'bg-white text-slate-900 font-semibold shadow-xs dark:bg-slate-800 dark:text-white'
                 : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
             <LayoutDashboard className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-            Live Intersection
+            <span>4-Way Simulator</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('video-analyzer')}
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+              activeTab === 'video-analyzer'
+                ? 'bg-white text-slate-900 font-semibold shadow-xs dark:bg-slate-800 dark:text-white'
+                : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
+            }`}
+          >
+            <FileVideo className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+            <span>Real Video CV Analyzer</span>
+            <span className="hidden sm:inline px-1.5 py-0.2 rounded text-[10px] bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300 font-semibold">
+              CCTV / MP4
+            </span>
           </button>
 
           <button
             onClick={() => setActiveTab('benchmark')}
-            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
               activeTab === 'benchmark'
                 ? 'bg-white text-slate-900 font-semibold shadow-xs dark:bg-slate-800 dark:text-white'
                 : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
             <Gauge className="w-3.5 h-3.5 text-slate-500" />
-            Efficiency & Delay Audit
+            <span>Efficiency Audit</span>
           </button>
         </nav>
 
@@ -354,6 +371,30 @@ export default function App() {
 
         {activeTab === 'dashboard' ? (
           <>
+            {/* Quick banner linking to Real Video CV Analyzer */}
+            <div className="p-3 rounded-lg border border-purple-200 dark:border-purple-800 bg-purple-50/70 dark:bg-purple-950/30 flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2.5">
+                <div className="p-1.5 rounded-md bg-purple-600 text-white shadow-xs">
+                  <FileVideo className="w-4 h-4" />
+                </div>
+                <div>
+                  <span className="font-semibold text-purple-950 dark:text-purple-200">
+                    Real Video & CCTV Vehicle Detection Mode:
+                  </span>
+                  <span className="text-purple-700 dark:text-purple-300 ml-1">
+                    Upload your own MP4 intersection video or analyze live CCTV camera feeds with real-time YOLOv8 bounding boxes.
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={() => setActiveTab('video-analyzer')}
+                className="px-3 py-1.5 rounded-md bg-purple-600 hover:bg-purple-700 text-white font-medium text-xs cursor-pointer shadow-xs transition-colors flex items-center gap-1"
+              >
+                <span>Launch Real Video Analyzer</span>
+                <span>→</span>
+              </button>
+            </div>
+
             {/* EMERGENCY PRIORITY PREEMPTION (Placed directly above the Intersection Monitor) */}
             <section>
               <EmergencyPriorityBar
@@ -474,6 +515,8 @@ export default function App() {
               </div>
             </section>
           </>
+        ) : activeTab === 'video-analyzer' ? (
+          <RealVideoAnalyzer theme={theme} />
         ) : (
           /* SECTION 5: CONTROLLER BENCHMARK & RESULTS AUDIT TAB */
           <div className="space-y-5">
